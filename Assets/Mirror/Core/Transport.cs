@@ -135,6 +135,7 @@ namespace Mirror
 
         /// <summary>Get a client's address on the server.</summary>
         // Can be useful for Game Master IP bans etc.
+        // DEPRECATED 2024-05-16
         [Obsolete("Transport.ServerGetClientAddress() was deprecated. Each connection's address is now passed only once in OnServerConnected instead.")]
         public abstract string ServerGetClientAddress(int connectionId);
 

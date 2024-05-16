@@ -67,6 +67,24 @@ namespace Mirror
             snapshotBufferSizeLimit = Mathf.Max((int)NetworkClient.snapshotSettings.bufferTimeMultiplier, snapshotBufferSizeLimit);
         }
 
+        // keep the old contstructor for a while in order to not break all projects.
+        // DEPRECATED 2024-05-16
+        [Obsolete("'new NetworkConnection(connectionId)' constructor was changed to 'new NetworkConnection(connectionId, address)'")]
+        public NetworkConnectionToClient(int networkConnectionId)
+            : base(networkConnectionId)
+        {
+            this.address = Transport.active.ServerGetClientAddress(connectionId);
+
+            // initialize EMA with 'emaDuration' seconds worth of history.
+            // 1 second holds 'sendRate' worth of values.
+            // multiplied by emaDuration gives n-seconds.
+            driftEma = new ExponentialMovingAverage(NetworkServer.sendRate * NetworkClient.snapshotSettings.driftEmaDuration);
+            deliveryTimeEma = new ExponentialMovingAverage(NetworkServer.sendRate * NetworkClient.snapshotSettings.deliveryTimeEmaDuration);
+
+            // buffer limit should be at least multiplier to have enough in there
+            snapshotBufferSizeLimit = Mathf.Max((int)NetworkClient.snapshotSettings.bufferTimeMultiplier, snapshotBufferSizeLimit);
+        }
+
         public void OnTimeSnapshot(TimeSnapshot snapshot)
         {
             // protect against ever growing buffer size attacks
