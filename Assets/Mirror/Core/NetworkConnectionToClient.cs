@@ -7,6 +7,8 @@ namespace Mirror
 {
     public class NetworkConnectionToClient : NetworkConnection
     {
+        // connection address, passed from transport
+
         // rpcs are collected in a buffer, and then flushed out together.
         // this way we don't need one NetworkMessage per rpc.
         // => prepares for LocalWorldState as well.
@@ -14,7 +16,7 @@ namespace Mirror
         readonly NetworkWriter reliableRpcs = new NetworkWriter();
         readonly NetworkWriter unreliableRpcs = new NetworkWriter();
 
-        public virtual string address => Transport.active.ServerGetClientAddress(connectionId);
+        public string address { get; private set; }
 
         /// <summary>NetworkIdentities that this connection can see</summary>
         // TODO move to server's NetworkConnectionToClient?
@@ -50,9 +52,11 @@ namespace Mirror
         /// <summary>Round trip time (in seconds) that it takes a message to go server->client->server.</summary>
         public double rtt => _rtt.Value;
 
-        public NetworkConnectionToClient(int networkConnectionId)
+        public NetworkConnectionToClient(int networkConnectionId, string address)
             : base(networkConnectionId)
         {
+            this.address = address;
+
             // initialize EMA with 'emaDuration' seconds worth of history.
             // 1 second holds 'sendRate' worth of values.
             // multiplied by emaDuration gives n-seconds.

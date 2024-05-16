@@ -624,8 +624,9 @@ namespace Mirror
         }
 
         // transport events ////////////////////////////////////////////////////
-        // called by transport
-        static void OnTransportConnected(int connectionId)
+        // called by transport.
+        // address is the (IP) address without port. useful for IP bans etc.
+        static void OnTransportConnected(int connectionId, string address)
         {
             // Debug.Log($"Server accepted client:{connectionId}");
 
@@ -655,7 +656,7 @@ namespace Mirror
             if (connections.Count < maxConnections)
             {
                 // add connection
-                NetworkConnectionToClient conn = new NetworkConnectionToClient(connectionId);
+                NetworkConnectionToClient conn = new NetworkConnectionToClient(connectionId, address);
                 OnConnected(conn);
             }
             else
